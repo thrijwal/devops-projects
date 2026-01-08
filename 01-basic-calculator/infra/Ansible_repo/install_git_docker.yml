@@ -1,0 +1,6 @@
+---
+- name: Install Git and Docker on Remote EC2
+  hosts: remote_servers
+  become: yes  # Run tasks as sudo
+  roles:
+    - install_software

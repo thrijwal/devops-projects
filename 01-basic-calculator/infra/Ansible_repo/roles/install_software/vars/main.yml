@@ -1,0 +1,4 @@
+---
+# vars file for roles/install_software
+git_version: latest
+docker_version: latest

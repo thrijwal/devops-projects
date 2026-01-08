@@ -1,0 +1,7 @@
+---
+- name: Install and Configure Node Exporter
+  hosts: remote_servers
+  become: true
+
+  roles:
+    - node_exporter

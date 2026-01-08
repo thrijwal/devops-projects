@@ -1,0 +1,82 @@
+---
+# Task 1: Download node_exporter tarball
+- name: Download node_exporter tarball
+  get_url:
+    url: https://github.com/prometheus/node_exporter/releases/download/v1.6.0/node_exporter-1.6.0.linux-amd64.tar.gz
+    dest: /tmp/node_exporter-1.6.0.linux-amd64.tar.gz
+    mode: '0644'
+
+# Task 2: Extract the tarball
+- name: Extract node_exporter tarball
+  unarchive:
+    src: /tmp/node_exporter-1.6.0.linux-amd64.tar.gz
+    dest: /tmp/
+    remote_src: yes
+
+# Task 3: Move node_exporter binary to /usr/local/bin/
+- name: Move node_exporter binary to /usr/local/bin/
+  command:
+    cmd: mv /tmp/node_exporter-1.6.0.linux-amd64/node_exporter /usr/local/bin/
+    creates: /usr/local/bin/node_exporter
+
+# Task 4: Verify the node_exporter version
+- name: Check the node_exporter version
+  command: /usr/local/bin/node_exporter --version
+  register: node_exporter_version
+  changed_when: false
+
+- name: Print node_exporter version
+  debug:
+    msg: "Node Exporter version: {{ node_exporter_version.stdout }}"
+
+# Task 5: Create systemd service file
+- name: Create systemd service file for node_exporter
+  template:
+    src: node_exporter.service.j2
+    dest: /etc/systemd/system/node_exporter.service
+    mode: '0644'
+
+# Task 6: Reload systemd to register the node_exporter service
+- name: Reload systemd to register the node_exporter service
+  systemd:
+    daemon_reload: yes
+
+# Task 7: Start and enable node_exporter service
+- name: Start and enable node_exporter service
+  systemd:
+    name: node_exporter
+    state: started
+    enabled: yes
+
+# Task 8: Verify the status of node_exporter service
+- name: Verify the status of node_exporter service
+  systemd:
+    name: node_exporter
+    state: started
+  register: service_status
+
+- name: Print service status
+  debug:
+    msg: "Node Exporter service is {{ service_status.state }}"
+
+# Task 9: Verify if node_exporter is listening on port 9100
+- name: Verify if node_exporter is listening on port 9100
+  wait_for:
+    host: "{{ ansible_host }}"
+    port: 9100
+    state: started
+    delay: 10
+    timeout: 60
+
+# Task 10: Fetch the node_exporter metrics page
+- name: Fetch the node_exporter metrics page
+  uri:
+    url: "http://localhost:9100/metrics"
+    method: GET
+    return_content: yes
+  register: metrics_page
+  failed_when: "'go_gc_duration_seconds' not in metrics_page.content"
+
+- name: Print fetched metrics page content (if successful)
+  debug:
+    msg: "Node Exporter metrics fetched successfully. Content preview: {{ metrics_page.content | truncate(100) }}"

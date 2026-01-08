@@ -1,0 +1,17 @@
+---
+- name: Update and upgrade system packages
+  apt:
+    update_cache: yes
+    upgrade: yes
+
+- name: Install Git
+  apt:
+    name: git
+    state: "{{ git_version }}"
+
+- name: Restart SSH if needed
+  service:
+    name: ssh
+    state: restarted
+  when: git_version is defined
+  notify: Restart SSH

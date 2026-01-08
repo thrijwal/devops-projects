@@ -1,0 +1,6 @@
+---
+- name: Include Git installation
+  include_tasks: git.yml
+
+- name: Include Docker installation
+  include_tasks: docker.yml
