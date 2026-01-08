@@ -50,14 +50,3 @@ The pipeline is triggered via Git webhooks and orchestrates the following lifecy
 | **Monitoring** | Prometheus, Grafana |
 
 ---
-## 📂 Project Structure
-
-```text
-01-basic-calculator/
-├── infra/
-│   ├── terraform/       # Provisioning EC2, VPCs, & S3 State buckets
-│   ├── ansible/         # Playbooks for server configuration
-│   └── scripts/         # Automation scripts for inventory updates
-├── auth-microservice/   # Python Flask Login Service
-├── calc-microservice/   # Java Spring Boot Calculator Service
-└── architecture-diagram.png
